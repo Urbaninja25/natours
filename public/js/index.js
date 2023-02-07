@@ -38,8 +38,6 @@ if (userDataForm)
     form.append('email', document.getElementById('email').value);
     //files is actually an arr and since there is only one select first element in arr
     form.append('photo', document.getElementById('photo').files[0]);
-    console.log(form);
-
     updateSettings(form, 'data');
   });
 

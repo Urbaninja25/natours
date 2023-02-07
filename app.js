@@ -7,6 +7,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const xss = require('xss-clean');
 const cookieParser = require('cookie-parser');
+//these will then expose a very leattel middlware function that we simply have to plug somewhere into our middlware stacck
+const compression = require('compression');
 const AppError = require('./utils/appError');
 const globalErrorhandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -88,6 +90,8 @@ app.use(
     ],
   })
 );
+
+app.use(compression());
 
 // --------------------Test middleware
 //!!!!!!!!!!!!!!!!!these way we will always dispay all the cookie in the console
