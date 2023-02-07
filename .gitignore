@@ -1,0 +1,5 @@
+# first folder we want to ignore 
+node_modules 
+# ignore or envirement variable file(config.env)
+*.env
+
