@@ -7,6 +7,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const xss = require('xss-clean');
 const cookieParser = require('cookie-parser');
+//!!!!!!!!!!!!!!!!!!!!
+const cors = require('cors');
 //these will then expose a very leattel middlware function that we simply have to plug somewhere into our middlware stacck
 const compression = require('compression');
 const AppError = require('./utils/appError');
@@ -28,6 +30,15 @@ app.set(
 );
 
 //1) GLOBAL MIDDLEWARES
+
+//impliment cors
+//these is a midllware function which expose another middlware function which add couple of different headers to our responce
+app.use(cors());
+
+//just anothe http method we can respond to .it just like app.get app.post and ext
+//* means we want to have these to all the routes.
+app.options('*', cors());
+
 // --------------------Serving static files
 app.use(express.static(`${__dirname}/public`));
 
