@@ -82,7 +82,7 @@ app.post(
 
 //-------------------- Body parser, reading data from body
 app.use((req, res, next) => {
-  if (req.originalUrl === '/webhook') {
+  if (req.originalUrl === '/webhook-checkout') {
     next(); // Do nothing with the body because I need it in a raw state.
   } else {
     express.json()(req, res, next); // ONLY do express.json() if the received request is NOT a WebHook from Stripe.
