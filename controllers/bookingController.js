@@ -17,8 +17,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     //object of options
     payment_method_types: ['card'],
     //url that will get called as soon as the credit card has succesfuly been charged
-    //!!!!!!!!!!!!!!!!!!!!!!
-    success_url: `${req.protocol}://${req.get('host')}/my-tours`,
+    //!!!!!!!!!!!!!!!!!!!!!! stap 1
+    success_url: `${req.protocol}://${req.get('host')}/my-tours?alert=booking`,
     //page where the user goes if they choose to cancel current payment.so let them go to tour page where they been previosly
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     //these option is very handy becouse ofc we already have access to the customers email and so with these we can save the user one step and make the checkout experience a lot smoother.so couse of protected route we have access on the current user

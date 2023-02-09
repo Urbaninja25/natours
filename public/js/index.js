@@ -3,7 +3,8 @@ import '@babel/polyfill';
 import { displayMap } from './mapbox';
 import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
-import { bookTour } from './stripe'; //!!!!!!!
+import { bookTour } from './stripe';
+import { showAlert } from './alerts';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
@@ -69,3 +70,7 @@ if (bookBtn)
 
     bookTour(tourId);
   });
+
+const alertMessage = document.querySelector('body').dataset.alert;
+//we overrite 20 secons on the screen
+if (alertMessage) showAlert('success', alertMessage, 20);

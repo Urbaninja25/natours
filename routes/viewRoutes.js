@@ -3,6 +3,9 @@ const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
 
 const router = express.Router();
+//stap 3
+//And so, this is a middleware function,which will basically run for each and every single request that's coming into this router,so basically for all the requests to our website.
+router.use(viewsController.alerts);
 
 router.get('/', authController.isLoggedIn, viewsController.getOverview);
 router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
