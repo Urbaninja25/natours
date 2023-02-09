@@ -16,6 +16,7 @@ const globalErrorhandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 const bookngRouter = require('./routes/bookingRoutes');
 
@@ -70,6 +71,15 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+
+// Stripe webhook, BEFORE body-parser, because stripe needs the body as stream not in json
+app.post(
+  '/webhook-checkout',
+  //express has these raw parser out of the box.Now we can use express.raw instead of having to install the body-parser or middleware from npm.
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
+
 //-------------------- Body parser, reading data from body
 app.use(express.json({ limit: '10kb' }));
 //!!!!!!!!couse we need to parse data coming from the form before request resconce cycle finished

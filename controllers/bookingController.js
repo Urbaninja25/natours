@@ -2,6 +2,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
+const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 const factory = require('./handlerFactory');
 
@@ -17,8 +18,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     payment_method_types: ['card'],
     //url that will get called as soon as the credit card has succesfuly been charged
     //!!!!!!!!!!!!!!!!!!!!!!
-    success_url: `${req.protocol}://${req.get('host')}/my-tours/?tour=${
-      req.params.tourId
+    success_url: `${req.protocol}://${req.get('host')}/my-tours
     }&user=${req.user.id}&price=${tour.price}`,
     //page where the user goes if they choose to cancel current payment.so let them go to tour page where they been previosly
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
@@ -54,19 +54,37 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 });
 //!!!!!!!!!!!!!!!!!!!
-//these function create new booking in the database
-exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-  console.log(req.query);
-  // This is only TEMPORARY, because it's UNSECURE: everyone can make bookings without paying
-  const { tour, user, price } = req.query;
-  //აქ გავდივართ სტანდარტულ პრცედურას რომ თუ ესენი არასებობს გადადი next middlware ზე.თუმცა რაარის next middlware actually?well remember that we want to create a new booking on these home url (look at success_url in sessions).and so what we need to do is to add this middlware function(createbookingchheckout)onto the middlware stack of these route handler
-  if (!tour || !user || !price) {
-    return next();
-  }
+const createBookingCheckout = async (session) => {
+  const tour = session.client_reference_id;
+  const user = (await User.findOne({ email: session.customer_email }))._id;
+  const price = session.line_items[0].price_data.unit_amount / 100; //// FIX !
   await Booking.create({ tour, user, price });
-  //with these we make pur temporaru solution a little more secure.so ამას როგორც ვაღწევთ არი რო რედაირექტს ვუკეთებთ overviu url ზე ოღონდ query string ის გარეშე რო ეს quary სტრინგი არ იყოს ესე მარტივად ხელმისაწვდომი.so როგორც ლოგიკა მოიქცევა არი რო თავიდან თავისი params ით და url ში მოცემული user dataთუ დაეტაკება "/" url ს ჩაირთვება ეს middlware ი რომელიც შექმნის ბუუქიგს და გააკეთებს redirects .redirect რო მოხდება შემდგომ if check ს ვეღარ გავივლით ცხადია იმიტორო req.query ს აღარ ექნება დატა და დაიქოლება next middlware ი რომელიც finally დაარენდერებს overview page ს
-  res.redirect(req.originalUrl.split('?')[0]);
-});
+};
+
+//that function is the one  the one that gets called once Stripe calls our webhook.
+exports.webhookCheckout = (req, res, next) => {
+  //The first thing that we need to do is to read this Stripe signature out of our headers,so signature and then request.Basically when Stripe calls our webhook,it will add a header to that request containing a special signature for our webhook.
+  const signature = req.headers['stripe-signature'];
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      //remember that this body here needs to be in the raw form,
+      req.body,
+      //So, you see, all of this is really to make the process super, super secure.We need all of this data like the signature and also the secret in order to basically validate the data that comes in the body
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    //In case there is an error,we want to send back an error to Stripe,
+    return res.status(400).send(`Webhook error: ${err.message}`);
+  }
+  //Now we're checking if that is really the event that we are receiving here just to be 100% sure.
+  if (event.type === 'checkout.session.completed')
+    createBookingCheckout(event.data.object);
+
+  res.status(200).json({ received: true });
+};
 
 exports.createBooking = factory.createOne(Booking);
 exports.getBooking = factory.getOne(Booking);
