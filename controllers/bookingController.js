@@ -17,7 +17,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     payment_method_types: ['card'],
     //url that will get called as soon as the credit card has succesfuly been charged
     //!!!!!!!!!!!!!!!!!!!!!!
-    success_url: `${req.protocol}://${req.get('host')}/?tour=${
+    success_url: `${req.protocol}://${req.get('host')}/my-tours/?tour=${
       req.params.tourId
     }&user=${req.user.id}&price=${tour.price}`,
     //page where the user goes if they choose to cancel current payment.so let them go to tour page where they been previosly
@@ -56,6 +56,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 //!!!!!!!!!!!!!!!!!!!
 //these function create new booking in the database
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+  console.log(req.query);
   // This is only TEMPORARY, because it's UNSECURE: everyone can make bookings without paying
   const { tour, user, price } = req.query;
   //აქ გავდივართ სტანდარტულ პრცედურას რომ თუ ესენი არასებობს გადადი next middlware ზე.თუმცა რაარის next middlware actually?well remember that we want to create a new booking on these home url (look at success_url in sessions).and so what we need to do is to add this middlware function(createbookingchheckout)onto the middlware stack of these route handler

@@ -105,12 +105,12 @@ app.use(
 app.use(compression());
 
 // --------------------Test middleware
-//!!!!!!!!!!!!!!!!!these way we will always dispay all the cookie in the console
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  // console.log(req.cookies);
-  next();
-});
+// //!!!!!!!!!!!!!!!!!these way we will always dispay all the cookie in the console
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
+//   // console.log(req.cookies);
+//   next();
+// });
 //----------------------routes
 
 //!!!!!!!!!!
@@ -118,11 +118,10 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
-//!!!!!
 app.use('/api/v1/bookings', bookngRouter);
 //------------------------------------------create unhandled error
 app.all('*', (req, res, next) => {
-  next(new AppError('cant find these route on the server', 400));
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 app.use(globalErrorhandler);
 
