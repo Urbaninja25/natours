@@ -80,7 +80,7 @@ exports.webhookCheckout = (req, res, next) => {
     );
   } catch (err) {
     //In case there is an error,we want to send back an error to Stripe,
-    console.log(`❌ Error message: ${err.message}`);
+    console.log(`Error message: ${err.message}`);
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
   //Now we're checking if that is really the event that we are receiving here just to be 100% sure.
