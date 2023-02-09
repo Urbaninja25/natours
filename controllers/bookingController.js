@@ -73,7 +73,7 @@ exports.webhookCheckout = (req, res, next) => {
   try {
     event = stripe.webhooks.constructEvent(
       //remember that this body here needs to be in the raw form,
-      req.body,
+      req.rawBody,
       //So, you see, all of this is really to make the process super, super secure.We need all of this data like the signature and also the secret in order to basically validate the data that comes in the body
       signature,
       process.env.STRIPE_WEBHOOK_SECRET

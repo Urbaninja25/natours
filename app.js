@@ -81,7 +81,13 @@ app.post(
 );
 
 //-------------------- Body parser, reading data from body
-app.use(express.json({ limit: '10kb' }));
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhook') {
+    next(); // Do nothing with the body because I need it in a raw state.
+  } else {
+    express.json()(req, res, next); // ONLY do express.json() if the received request is NOT a WebHook from Stripe.
+  }
+});
 //!!!!!!!!couse we need to parse data coming from the form before request resconce cycle finished
 //and it still express built in middlwware + and it called these way "urlencoded" couse the way form sends data to the server is actually also called URL encoded.
 // app.use(express.urlencoded({ extended: true, limit: '10kb' }));
