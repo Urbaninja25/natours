@@ -36,7 +36,11 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
             name: `${tour.name} Tour`,
             description: tour.summary,
             //now these imagies here they need to be live imagies so basically imagies that are hosted on the internet,becouse stripe will actually upload this image to their own server.so ამასაც როცა დიფლოის გავაკეთებთ მერე ჩავსვავთ ამ ლინკს ახლა placeholder ად გვქონდეს აქ  ეს რაც არის natours.dev იდან აღებული.მივიდა base ში და ერთერთ card თან მიიწანა კურსორი.მერე inspect it and from html copy img link adress და ესე გადავაკეთე .რეალურად სწორეა იმიტორო public ში ზუსტად ეგრე მიდის path,- public/img/tours/imagecover name
-            images: [`https://www.natours.dev/img/tours/${tour.imageCover}`],
+            images: [
+              `${req.protocol}://${req.get('host')}/img/tours/${
+                tour.imageCover
+              }`,
+            ],
           },
           unit_amount: tour.price * 100,
         },
